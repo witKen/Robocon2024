@@ -145,35 +145,50 @@ class Detection:
     
     def findLargestContour(contours):
         maxArea = 0
-        minArea = 500
+        minArea = 600
         largestContour = None
         for contour in contours:
             area = cv2.contourArea(contour)
             if area > maxArea and area > minArea: 
-                maxArea = area
-                largestContour = contour
+                perimeter = cv2.arcLength(contour, True)
+                circularity = 4 * np.pi * area / (perimeter * perimeter)
+                hull = cv2.convexHull(contour)
+                hull_area = cv2.contourArea(hull)
+                solidity = float(area) / hull_area
+                if circularity > 0.7 or solidity > 0.8:
+                    maxArea = area
+                    largestContour = contour
         return largestContour
 
-    def isBallShape(contour):
-        perimeter = cv2.arcLength(contour, True)
-        area = cv2.contourArea(contour)
-        circularity = 4 * np.pi * area / (perimeter * perimeter)
-        if circularity > 0.7:  # Adjust the circularity threshold as needed, 0.7
-            return True
-        return False
+    # def isBallShape(contour):
+    #     perimeter = cv2.arcLength(contour, True)
+    #     area = cv2.contourArea(contour)
+    #     circularity = 4 * np.pi * area / (perimeter * perimeter)
+    #     if circularity > 0.4:  # Adjust the circularity threshold as needed, 0.7
+    #         return True
+    #     return False
 
-    lower_red1 = np.array([0, 70, 50]) #0, 70, 50
-    upper_red1 = np.array([10, 255, 255])
+    lower_red1 = np.array([0, 100, 100]) #0, 70, 50
+    upper_red1 = np.array([8, 255, 255])
 
-    lower_red2 = np.array([170, 70, 50]) #0, 70, 50
+    # lower_red1 = np.array([0, 70, 50]) #0, 70, 50
+    # upper_red1 = np.array([15, 255, 255])
+
+    lower_red2 = np.array([170, 70, 50]) #170, 70, 50
     upper_red2 = np.array([180, 255, 255])
+
+    # lower_red2 = np.array([160, 70, 50]) #0, 70, 50
+    # upper_red2 = np.array([180, 255, 255])
 
     lower_blue = np.array([110, 50, 50])
     upper_blue = np.array([130, 255, 255])
 
-    video_path = 'IMG_2701.mp4'  # Replace with the actual path to your video file
-    cap = cv2.VideoCapture(video_path)
-    # cap = cv2.VideoCapture(0)
+    # lower_blue = np.array([100, 50, 50])
+    # upper_blue = np.array([140, 255, 255])
+
+    video_path = '1.mp4'  # Replace with the actual path to your video file
+    # cap = cv2.VideoCapture(video_path)
+    cap = cv2.VideoCapture(0)
 
     fps = cap.get(cv2.CAP_PROP_FPS)
     delay = int(1000 / fps)  # Delay corresponding to video's frame rate
@@ -195,14 +210,14 @@ class Detection:
         red2_largestContour = findLargestContour(red2_contours)
         blue_largestContour = findLargestContour(blue_contours)
 
-        if red1_largestContour is not None and isBallShape(red1_largestContour):
+        if red1_largestContour is not None:
             red_moments = cv2.moments(red1_largestContour)
             red_cX = int(red_moments["m10"] / red_moments["m00"])
             red_cY = int(red_moments["m01"] / red_moments["m00"])
             red_x, red_y, red_w, red_h = cv2.boundingRect(red1_largestContour)
             cv2.rectangle(frame, (red_x, red_y), (red_x + red_w, red_y + red_h), (0, 0, 255), 2)
             cv2.circle(frame, (red_cX, red_cY), 10, (0, 0, 255), -1)
-        elif red2_largestContour is not None and isBallShape(red2_largestContour):
+        elif red2_largestContour is not None:
             red_moments = cv2.moments(red2_largestContour)
             red_cX = int(red_moments["m10"] / red_moments["m00"])
             red_cY = int(red_moments["m01"] / red_moments["m00"])
@@ -210,7 +225,7 @@ class Detection:
             cv2.rectangle(frame, (red_x, red_y), (red_x + red_w, red_y + red_h), (0, 0, 255), 2)
             cv2.circle(frame, (red_cX, red_cY), 10, (0, 0, 255), -1)
 
-        if blue_largestContour is not None and isBallShape(blue_largestContour):
+        if blue_largestContour is not None:
             blue_moments = cv2.moments(blue_largestContour)
             blue_cX = int(blue_moments["m10"] / blue_moments["m00"])
             blue_cY = int(blue_moments["m01"] / blue_moments["m00"])
@@ -223,10 +238,10 @@ class Detection:
         cv2.imshow('Red Mask 2', red2_mask)
         cv2.imshow('Blue Mask', blue_mask)
         
-        if cv2.waitKey(delay) & 0xFF == ord('d'):
-            break
-        # if cv2.waitKey(1) & 0xFF == ord('d'):
+        # if cv2.waitKey(delay) & 0xFF == ord('d'):
         #     break
+        if cv2.waitKey(1) & 0xFF == ord('d'):
+            break
 
     cap.release()
     cv2.destroyAllWindows()
