@@ -180,15 +180,15 @@ class Detection:
     # lower_red2 = np.array([160, 70, 50]) #0, 70, 50
     # upper_red2 = np.array([180, 255, 255])
 
-    lower_blue = np.array([110, 50, 50])
+    lower_blue = np.array([110, 100, 100])
     upper_blue = np.array([130, 255, 255])
 
     # lower_blue = np.array([100, 50, 50])
     # upper_blue = np.array([140, 255, 255])
 
-    video_path = '1.mp4'  # Replace with the actual path to your video file
-    # cap = cv2.VideoCapture(video_path)
-    cap = cv2.VideoCapture(0)
+    video_path = '2.mp4'  # Replace with the actual path to your video file
+    cap = cv2.VideoCapture(video_path)
+    # cap = cv2.VideoCapture(0)
 
     fps = cap.get(cv2.CAP_PROP_FPS)
     delay = int(1000 / fps)  # Delay corresponding to video's frame rate
