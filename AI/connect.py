@@ -209,6 +209,15 @@ def draw_board(board):
 
     pygame.display.update()
 
+def is_board_full(board):
+    check = 0
+    for c in range(COLUMN_COUNT):
+        for r in range(ROW_COUNT):
+            if board[r][c] == 1 or board[r][c] == 2:
+                check += 1
+    if check == 15:
+        return True
+
 board = create_board()
 print_board(board)
 game_over = False
@@ -352,7 +361,13 @@ while not game_over:
                             game_over = True
         
 
-            draw_board(board)
+        draw_board(board)
 
-            if game_over:
-                pygame.time.wait(3000)
+        if is_board_full(board) and not winning_move(board,1) and not winning_move(board, 2):
+            label = myfont.render("Draw",1 , WHITE)
+            print("Draw")
+            screen.blit(label, (40, 10))
+            game_over = True
+
+    if game_over:
+        pygame.time.wait(3000)
