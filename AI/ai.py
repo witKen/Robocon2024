@@ -1,3 +1,5 @@
+# Simple rule base AI for robocon 2024 inspired by connect 4 game.
+
 import numpy as np
 import pygame
 import sys
